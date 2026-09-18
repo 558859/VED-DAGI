@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Association V.E.D DAGI | Site Officiel</title>
+    
+    <!-- Metatags SEO et Partage Réseaux Sociaux -->
+    <meta name="description" content="Site officiel de l'Association Vision d'Étudiant de Dagi (V.E.D DAGI). Orientation, mentorat et projets communautaires.">
+    <meta property="og:title" content="Association V.E.D DAGI | Site Officiel">
+    <meta property="og:description" content="Une communauté d'élèves et d'étudiants unis pour l'orientation et le développement local.">
+
+    <!-- Polices Google Premium -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome 4.7 -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    
+    <!-- Feuille de style externe -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Socket.IO -->
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <!-- Overlay d'arrière-plan pour le menu mobile -->
+    <div class="menu-overlay" id="menuOverlay" onclick="hideMenu()"></div>
+
+    <!-- Header / Accueil -->
+    <section class="header" id="header">
+        <nav id="navbar">
+            <a href="index.html" class="logo-container" style="display: flex; align-items: center; gap: 12px; text-decoration: none;">
+                <img src="images/IB.png" alt="Logo V.E.D DAGI" class="logo-img" style="width: 50px; height: 50px; min-width: 50px; min-height: 50px; object-fit: contain; border-radius: 50%; display: block;" onerror="this.style.display='none'">
+                <span class="logo">V.E.D <span>DAGI</span></span>
+            </a>
+            
+            <div class="nav-links" id="navLinks">
+                <i class="fa fa-times close-menu-btn" onclick="hideMenu()"></i>
+                <ul>
+                    <li><a href="#header" onclick="hideMenu()">ACCUEIL</a></li>
+                    <li><a href="#programmes" onclick="hideMenu()">PROGRAMMES</a></li>
+                    <li><a href="#reunion" onclick="hideMenu()">RÉUNION EN LIGNE</a></li>
+                    <li><a href="#projets" onclick="hideMenu()">PROJETS</a></li>
+                    <li><a href="#bureau" onclick="hideMenu()">BUREAU</a></li>
+                    <li><a href="javascript:void(0)" onclick="openModal(); hideMenu();">CONTACTEZ-NOUS</a></li>
+                    <li><a href="javascript:void(0)" onclick="openModal(); hideMenu();" class="hero-btn">REJOINDRE</a></li>
+                </ul>
+            </div>
+
+            <!-- Icône hamburger responsive -->
+            <i class="fa fa-bars menu-toggle-btn" onclick="showMenu()"></i>
+        </nav>
+
+        <div class="text-box">
+            <!-- Titre avec effet miroir / brillance -->
+            <h1 class="shine-title">Vision d'Étudiant de Dagi</h1>
+            <p class="fade-in-text">Une communauté d'élèves et d'étudiants unis pour l'orientation et le développement local.</p>
+            <a href="#programmes" class="hero-btn">En Savoir Plus</a>
+        </div>
+    </section>
+
+    <!-- Nos Programmes -->
+    <section class="course" id="programmes">
+        <h1>Nos Domaines d'Action</h1>
+        <p>Découvrez comment notre association accompagne la jeunesse vers la réussite.</p>
+
+        <div class="row">
+            <div class="course-col">
+                <div class="card-icon"><i class="fa fa-graduation-cap"></i></div>
+                <h3>Orientation Bac</h3>
+                <p>Accompagnement personnalisé des nouveaux bacheliers dans le choix de leurs filières universitaires et opportunités d'études.</p>
+            </div>
+            <div class="course-col">
+                <div class="card-icon"><i class="fa fa-users"></i></div>
+                <h3>Mentorat Étudiant</h3>
+                <p>Mise en relation entre étudiants séniors et nouveaux arrivants pour faciliter leur intégration académique et sociale.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Réunion Google Meet -->
+    <section id="reunion" class="meet-section">
+        <div class="meet-card">
+            <i class="fa fa-video-camera meet-icon"></i>
+            <h2>Rejoindre une Réunion en Ligne</h2>
+            <p>Participez à nos séances d'orientation, réunions du bureau ou assemblées directement via Google Meet.</p>
+            <a href="https://meet.google.com/" target="_blank" class="btn-meet">
+                <i class="fa fa-external-link" style="margin-right: 6px;"></i> Rejoindre la Réunion (Google Meet)
+            </a>
+        </div>
+    </section>
+
+    <!-- Nos Projets -->
+    <section class="campus" id="projets">
+        <h1>Nos Activités sur le Terrain</h1>
+        <p>Aperçu de nos événements et rencontres d'orientation organisés à Dagi.</p>
+
+        <div class="row">
+            <div class="campus-col">
+                <img src="https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=600" alt="Journée d'orientation">
+                <div class="layer">
+                    <h3>ORIENTATION 2026</h3>
+                </div>
+            </div>
+            <div class="campus-col">
+                <img src="https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=600" alt="Rencontre d'échange">
+                <div class="layer">
+                    <h3>SESSIONS D'ÉCHANGE</h3>
+                </div>
+            </div>
+            <div class="campus-col">
+                <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=600" alt="Rencontre communautaire">
+                <div class="layer">
+                    <h3>VIE ASSOCIATIVE</h3>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bureau Exécutif -->
+    <section class="facilities" id="bureau">
+        <h1>Le Bureau Exécutif</h1>
+        <p>Les membres engagés au service de l'association V.E.D DAGI.</p>
+
+        <div class="row">
+            <div class="facilities-col">
+                <div class="img-wrapper">
+                    <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=600" alt="Président">
+                    <div class="dark-overlay"></div>
+                    <span class="role-badge">Président</span>
+                </div>
+                <h3>Ibrahim Attoumani</h3>
+                <p><strong>Président</strong> - Coordination générale, vision stratégique et partenariats de l'association.</p>
+            </div>
+
+            <div class="facilities-col">
+                <div class="img-wrapper">
+                    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=600" alt="Secrétaire">
+                    <div class="dark-overlay"></div>
+                    <span class="role-badge">Secrétaire</span>
+                </div>
+                <h3>Fatoumata Camara</h3>
+                <p><strong>Secrétaire Générale</strong> - Gestion administrative, suivi des événements et de la communication.</p>
+            </div>
+
+            <div class="facilities-col">
+                <div class="img-wrapper">
+                    <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=600" alt="Trésorier">
+                    <div class="dark-overlay"></div>
+                    <span class="role-badge">Trésorier</span>
+                </div>
+                <h3>Mamadou Sow</h3>
+                <p><strong>Trésorier</strong> - Gestion financière, suivi du budget et logistique des projets.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Témoignages -->
+    <section class="testimonials">
+        <h1>Ce Que Disent Nos Membres</h1>
+        <p>Retours d'expérience d'étudiants ayant bénéficié de nos programmes.</p>
+
+        <div class="row">
+            <div class="testimonials-col">
+                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=100" alt="Amina">
+                <div>
+                    <p>"L'orientation m'a permis d'aborder mon entrée à l'université avec sérénité."</p>
+                    <h3>Amina M.</h3>
+                    <div class="stars">
+                        <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonials-col">
+                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=100" alt="Bakary">
+                <div>
+                    <p>"Une initiative formidable pour rassembler les jeunes de Dagi."</p>
+                    <h3>Bakary S.</h3>
+                    <div class="stars">
+                        <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-half-o"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="cta" id="cta">
+        <h2>Rejoignez l'Association V.E.D DAGI</h2>
+        <button onclick="openModal()" class="hero-btn">CONTACTEZ-NOUS</button>
+    </section>
+
+    <!-- Footer -->
+    <section class="footer" id="about">
+        <h4>À Propos de Nous</h4>
+        <p style="margin-bottom: 1rem;">Vision d'Étudiant de Dagi (V.E.D DAGI) est une association œuvrant pour la promotion de l'éducation.</p>
+        <div class="icons">
+            <a href="#"><i class="fa fa-facebook"></i></a>
+            <a href="#"><i class="fa fa-twitter"></i></a>
+            <a href="#"><i class="fa fa-instagram"></i></a>
+            <a href="#"><i class="fa fa-linkedin"></i></a>
+        </div>
+        <p>&copy; 2026 Vision d'Étudiant de Dagi (V.E.D DAGI). Tous droits réservés.</p>
+    </section>
+
+    <!-- Bouton Retour en Haut -->
+    <button id="backToTop" class="back-to-top" onclick="scrollToTop()" aria-label="Retour en haut">
+        <i class="fa fa-chevron-up"></i>
+    </button>
+
+    <!-- Notification Toast de Confirmation de Formulaire -->
+    <div id="toast" class="toast-notification">
+        <i class="fa fa-check-circle" style="color: #10b981; margin-right: 8px;"></i>
+        <span id="toast-text">Merci ! Votre demande d'inscription a bien été reçue.</span>
+    </div>
+
+    <!-- FORMULAIRE DE CONTACT (MODAL REJOINDRE) -->
+    <div class="modal" id="contactModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h2 style="color: var(--primary); margin-bottom: 0.5rem;">Rejoignez V.E.D DAGI</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">Remplissez vos coordonnées pour vous inscrire ou prendre contact.</p>
+
+            <form id="inscriptionForm" onsubmit="handleFormSubmit(event)">
+                <div class="form-group">
+                    <label for="nom">Nom complet *</label>
+                    <input type="text" id="nom" placeholder="Ex: Ibrahim Attoumani" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Adresse Email *</label>
+                    <input type="email" id="email" placeholder="votre.email@exemple.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="pays">Pays de résidence *</label>
+                    <input type="text" id="pays" placeholder="Ex: Guinée, Comores, France..." required>
+                </div>
+
+                <div class="form-group">
+                    <label for="telephone">Numéro de téléphone (avec indicatif) *</label>
+                    <input type="tel" id="telephone" placeholder="Ex: +224 600 00 00 00" required>
+                </div>
+
+               <div class="form-group">
+    <label for="niveau">Niveau d'études *</label>
+    <select id="niveau" name="niveau" required>
+        <option value="" disabled selected>Sélectionnez un niveau dans la liste</option>
+        <option value="Baccalaureat">Baccalauréat</option>
+        <option value="Licence 1">Licence 1</option>
+        <option value="Licence 2">Licence 2</option>
+        <option value="Licence 3">Licence 3</option>
+        <option value="Licence 4">Licence 4</option>
+        <option value="Master 1">Master 1</option>
+        <option value="Master 2">Master 2</option>
+        <option value="Doctorat">Doctorat</option>
+    </select>
+    <input type="text" id="autreNiveauInput" name="autreNiveau" class="custom-niveau-input" placeholder="Ou saisissez directement votre niveau ici (ex: BTS, Autre...)" style="margin-top: 8px;">
+</div>
+
+                <div class="form-group">
+                    <label for="message">Message ou motivations</label>
+                    <textarea id="message" rows="2" placeholder="Présentez-vous brièvement ou posez votre question..."></textarea>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">Envoyer l'inscription</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript applicatif externe -->
+    <script src="app.js"></script>
+</body>
+</html>
