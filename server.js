@@ -14,11 +14,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Configuration du transporteur SMTP Brevo
+// Configuration du transporteur SMTP Brevo (Port 465 SSL)
 const transporter = nodemailer.createTransport({
     host: 'smtp-relay.brevo.com',
-    port: 587,
-    secure: false, // TLS
+    port: 465,
+    secure: true, // true pour le port 465 (SSL)
     auth: {
         user: process.env.BREVO_USER,
         pass: process.env.BREVO_PASS
