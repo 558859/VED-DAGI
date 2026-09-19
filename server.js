@@ -14,12 +14,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Configuration du transporteur SMTP Gmail
+// Configuration du transporteur SMTP Gmail adaptée à Render (Port 465 SSL explicite)
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true, // SSL/TLS sur port 465 pour éviter la déconnexion sur Render
     auth: {
-        user: process.env.BREVO_USER, // abouibrahim401@gmail.com
-        pass: process.env.BREVO_PASS  // suprrienconnulesr
+        user: process.env.BREVO_USER,
+        pass: process.env.BREVO_PASS
     }
 });
 
@@ -84,7 +86,7 @@ app.post('/api/inscription', async (req, res) => {
 
         // 2. Préparation du mail de confirmation
         const mailOptions = {
-            from: '"V.E.D DAGI" <abouibrahim401@gmail.com>',
+            from: '"V.E.D DAGI" <' + (process.env.BREVO_USER || 'abouibrahim401@gmail.com') + '>',
             to: email,
             subject: 'Confirmation de votre inscription - V.E.D DAGI',
             html: `
