@@ -14,21 +14,19 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Configuration du transporteur SMTP Brevo (Port 465 SSL)
+// Configuration du transporteur SMTP Gmail
 const transporter = nodemailer.createTransport({
-    host: 'smtp-relay.brevo.com',
-    port: 465,
-    secure: true, // true pour le port 465 (SSL)
+    service: 'gmail',
     auth: {
-        user: process.env.BREVO_USER,
-        pass: process.env.BREVO_PASS
+        user: process.env.BREVO_USER, // abouibrahim401@gmail.com
+        pass: process.env.BREVO_PASS  // suprrienconnulesr
     }
 });
 
 // Connexion Aiven Cloud MySQL sécurisée
 const db = mysql.createPool({
     host: process.env.DB_HOST || 'mysql-38bb9285-abouibrahim401-e4cd.i.aivencloud.com',
-    port: process.env.DB_PORT || 26721,
+    port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 26721,
     user: process.env.DB_USER || 'avnadmin',
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME || 'defaultdb',
@@ -38,6 +36,7 @@ const db = mysql.createPool({
     queueLimit: 0
 });
 
+// Initialisation de la table dans MySQL
 async function initDB() {
     try {
         const connection = await db.getConnection();
@@ -61,6 +60,7 @@ async function initDB() {
 }
 initDB();
 
+// Route d'inscription
 app.post('/api/inscription', async (req, res) => {
     const nom = req.body.nom || '';
     const email = req.body.email || '';
@@ -80,6 +80,7 @@ app.post('/api/inscription', async (req, res) => {
         // 1. Sauvegarde dans MySQL / Aiven Cloud
         const query = 'INSERT INTO membres (nom, email, pays, telephone, niveau, message) VALUES (?, ?, ?, ?, ?, ?)';
         await db.execute(query, [nom, email, pays, telephone, niveau, message]);
+        console.log('Inscription enregistrée avec succès dans la base de données.');
 
         // 2. Préparation du mail de confirmation
         const mailOptions = {
@@ -105,21 +106,21 @@ app.post('/api/inscription', async (req, res) => {
             `
         };
 
-        // 3. Envoi de l'e-mail automatique via Brevo
+        // 3. Envoi asynchrone de l'e-mail via Gmail
         transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
-                console.error("Erreur d'envoi d'e-mail via Brevo :", error);
+                console.error("Erreur d'envoi d'e-mail via Gmail :", error);
             } else {
                 console.log("E-mail de confirmation envoyé :", info.messageId);
             }
         });
 
-        // 4. Réponse de confirmation
-        res.status(200).json({ success: true, message: 'Inscription réussie et e-mail de confirmation envoyé !' });
+        // 4. Réponse au client
+        return res.status(200).json({ success: true, message: 'Inscription réussie et e-mail de confirmation envoyé !' });
 
     } catch (error) {
-        console.error('Erreur serveur / SQL :', error);
-        res.status(500).json({ success: false, message: 'Erreur interne lors de l\'enregistrement.' });
+        console.error('Erreur détaillée lors de l\'enregistrement :', error);
+        return res.status(500).json({ success: false, message: 'Erreur interne lors de l\'enregistrement.' });
     }
 });
 
