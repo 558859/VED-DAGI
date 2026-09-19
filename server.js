@@ -14,6 +14,17 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Configuration du transporteur SMTP Brevo
+const transporter = nodemailer.createTransport({
+    host: 'smtp-relay.brevo.com',
+    port: 587,
+    secure: false, // TLS
+    auth: {
+        user: process.env.BREVO_USER,
+        pass: process.env.BREVO_PASS
+    }
+});
+
 // Connexion Aiven Cloud MySQL sécurisée
 const db = mysql.createPool({
     host: process.env.DB_HOST || 'mysql-38bb9285-abouibrahim401-e4cd.i.aivencloud.com',
@@ -26,6 +37,7 @@ const db = mysql.createPool({
     connectionLimit: 10,
     queueLimit: 0
 });
+
 async function initDB() {
     try {
         const connection = await db.getConnection();
@@ -65,9 +77,46 @@ app.post('/api/inscription', async (req, res) => {
     }
 
     try {
+        // 1. Sauvegarde dans MySQL / Aiven Cloud
         const query = 'INSERT INTO membres (nom, email, pays, telephone, niveau, message) VALUES (?, ?, ?, ?, ?, ?)';
         await db.execute(query, [nom, email, pays, telephone, niveau, message]);
-        res.status(200).json({ success: true, message: 'Inscription réussie !' });
+
+        // 2. Préparation du mail de confirmation
+        const mailOptions = {
+            from: '"V.E.D DAGI" <abouibrahim401@gmail.com>',
+            to: email,
+            subject: 'Confirmation de votre inscription - V.E.D DAGI',
+            html: `
+                <div style="font-family: Arial, sans-serif; padding: 20px; color: #333; max-width: 600px; margin: auto; border: 1px solid #e0e0e0; border-radius: 8px;">
+                    <h2 style="color: #2e7d32; text-align: center;">Vision Étudiante de Dagi (V.E.D DAGI)</h2>
+                    <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;">
+                    <p>Bonjour <strong>${nom}</strong>,</p>
+                    <p>Nous avons bien reçu votre formulaire d'inscription au sein de notre association.</p>
+                    <p><strong>Récapitulatif de vos informations :</strong></p>
+                    <ul>
+                        <li><strong>Pays :</strong> ${pays}</li>
+                        <li><strong>Téléphone :</strong> ${telephone}</li>
+                        <li><strong>Niveau d'étude :</strong> ${niveau}</li>
+                    </ul>
+                    <p>Notre équipe examinera votre demande et prendra contact avec vous très prochainement.</p>
+                    <br>
+                    <p>Cordialement,<br><strong>L'équipe V.E.D DAGI</strong></p>
+                </div>
+            `
+        };
+
+        // 3. Envoi de l'e-mail automatique via Brevo
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.error("Erreur d'envoi d'e-mail via Brevo :", error);
+            } else {
+                console.log("E-mail de confirmation envoyé :", info.messageId);
+            }
+        });
+
+        // 4. Réponse de confirmation
+        res.status(200).json({ success: true, message: 'Inscription réussie et e-mail de confirmation envoyé !' });
+
     } catch (error) {
         console.error('Erreur serveur / SQL :', error);
         res.status(500).json({ success: false, message: 'Erreur interne lors de l\'enregistrement.' });
