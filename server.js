@@ -14,10 +14,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Configuration du client API HTTP Brevo
+// Configuration sécurisée du client API HTTP Brevo
 const apiInstance = new Brevo.TransactionalEmailsApi();
-const apiKey = apiInstance.authentications['apiKey'];
-apiKey.apiKey = process.env.BREVO_API_KEY;
+if (process.env.BREVO_API_KEY) {
+    apiInstance.setApiKey(Brevo.TransactionalEmailsApiApiKeys.apiKey, process.env.BREVO_API_KEY);
+} else {
+    console.error("ATTENTION : La variable d'environnement BREVO_API_KEY est manquante !");
+}
 
 // Connexion Aiven Cloud MySQL sécurisée
 const db = mysql.createPool({
@@ -99,14 +102,14 @@ app.post('/api/inscription', async (req, res) => {
                     <p>Cordialement,<br><strong>L'équipe V.E.D DAGI</strong></p>
                 </div>
             `;
-            // Adresse expéditeur validée sur Brevo
+            // Adresse expéditeur vérifiée sur votre compte Brevo
             sendSmtpEmail.sender = { "name": "V.E.D DAGI", "email": "abouibrahim401@gmail.com" };
             sendSmtpEmail.to = [{ "email": email, "name": nom }];
 
             const response = await apiInstance.sendTransacEmail(sendSmtpEmail);
-            console.log('E-mail de confirmation envoyé via Brevo avec succès. ID:', response.body?.messageId || response.messageId);
+            console.log('E-mail envoyé via Brevo avec succès. Détails :', JSON.stringify(response));
         } catch (mailErr) {
-            console.error("Erreur lors de l'envoi d'e-mail via Brevo :", mailErr);
+            console.error("Erreur d'envoi Brevo :", mailErr.response ? mailErr.response.body : mailErr.message);
         }
 
         // 3. Réponse au client
