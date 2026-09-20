@@ -2,7 +2,7 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const mysql = require('mysql2/promise');
-const { Resend } = require('resend');
+const Brevo = require('@getbrevo/brevo');
 const path = require('path');
 require('dotenv').config();
 
@@ -14,8 +14,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Initialisation de Resend avec la clé d'environnement
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Configuration du client API HTTP Brevo
+const apiInstance = new Brevo.TransactionalEmailsApi();
+const apiKey = apiInstance.authentications['apiKey'];
+apiKey.apiKey = process.env.BREVO_API_KEY;
 
 // Connexion Aiven Cloud MySQL sécurisée
 const db = mysql.createPool({
@@ -76,33 +78,35 @@ app.post('/api/inscription', async (req, res) => {
         await db.execute(query, [nom, email, pays, telephone, niveau, message]);
         console.log('Inscription enregistrée avec succès dans la base de données.');
 
-        // 2. Envoi de l'e-mail via l'API HTTP Resend (contourne le blocage de ports Render)
+        // 2. Envoi de l'e-mail via l'API HTTP Brevo (sans blocage de port SMTP)
         try {
-            const data = await resend.emails.send({
-                from: 'V.E.D DAGI <onboarding@resend.dev>',
-                to: [email],
-                subject: 'Confirmation de votre inscription - V.E.D DAGI',
-                html: `
-                    <div style="font-family: Arial, sans-serif; padding: 20px; color: #333; max-width: 600px; margin: auto; border: 1px solid #e0e0e0; border-radius: 8px;">
-                        <h2 style="color: #2e7d32; text-align: center;">Vision Étudiante de Dagi (V.E.D DAGI)</h2>
-                        <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;">
-                        <p>Bonjour <strong>${nom}</strong>,</p>
-                        <p>Nous avons bien reçu votre formulaire d'inscription au sein de notre association.</p>
-                        <p><strong>Récapitulatif de vos informations :</strong></p>
-                        <ul>
-                            <li><strong>Pays :</strong> ${pays}</li>
-                            <li><strong>Téléphone :</strong> ${telephone}</li>
-                            <li><strong>Niveau d'étude :</strong> ${niveau}</li>
-                        </ul>
-                        <p>Notre équipe examinera votre demande et prendra contact avec vous très prochainement.</p>
-                        <br>
-                        <p>Cordialement,<br><strong>L'équipe V.E.D DAGI</strong></p>
-                    </div>
-                `
-            });
-            console.log('E-mail de confirmation envoyé via Resend avec succès. ID:', data.id);
+            const sendSmtpEmail = new Brevo.SendSmtpEmail();
+            sendSmtpEmail.subject = "Confirmation de votre inscription - V.E.D DAGI";
+            sendSmtpEmail.htmlContent = `
+                <div style="font-family: Arial, sans-serif; padding: 20px; color: #333; max-width: 600px; margin: auto; border: 1px solid #e0e0e0; border-radius: 8px;">
+                    <h2 style="color: #2e7d32; text-align: center;">Vision Étudiante de Dagi (V.E.D DAGI)</h2>
+                    <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;">
+                    <p>Bonjour <strong>${nom}</strong>,</p>
+                    <p>Nous avons bien reçu votre formulaire d'inscription au sein de notre association.</p>
+                    <p><strong>Récapitulatif de vos informations :</strong></p>
+                    <ul>
+                        <li><strong>Pays :</strong> ${pays}</li>
+                        <li><strong>Téléphone :</strong> ${telephone}</li>
+                        <li><strong>Niveau d'étude :</strong> ${niveau}</li>
+                    </ul>
+                    <p>Notre équipe examinera votre demande et prendra contact avec vous très prochainement.</p>
+                    <br>
+                    <p>Cordialement,<br><strong>L'équipe V.E.D DAGI</strong></p>
+                </div>
+            `;
+            // L'adresse de l'expéditeur doit correspondre à votre compte Brevo
+            sendSmtpEmail.sender = { "name": "V.E.D DAGI", "email": "votre_email_brevo@gmail.com" };
+            sendSmtpEmail.to = [{ "email": email, "name": nom }];
+
+            const response = await apiInstance.sendTransacEmail(sendSmtpEmail);
+            console.log('E-mail de confirmation envoyé via Brevo avec succès. ID:', response.messageId);
         } catch (mailErr) {
-            console.error("Erreur lors de l'envoi d'e-mail via Resend :", mailErr);
+            console.error("Erreur lors de l'envoi d'e-mail via Brevo :", mailErr);
         }
 
         // 3. Réponse au client
