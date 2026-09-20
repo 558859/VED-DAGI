@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Initialisation du client API Resend
+// Initialisation de Resend avec la clé d'environnement
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Connexion Aiven Cloud MySQL sécurisée
@@ -76,7 +76,7 @@ app.post('/api/inscription', async (req, res) => {
         await db.execute(query, [nom, email, pays, telephone, niveau, message]);
         console.log('Inscription enregistrée avec succès dans la base de données.');
 
-        // 2. Envoi de l'e-mail via l'API HTTP Resend
+        // 2. Envoi de l'e-mail via l'API HTTP Resend (contourne le blocage de ports Render)
         try {
             const data = await resend.emails.send({
                 from: 'V.E.D DAGI <onboarding@resend.dev>',
@@ -100,7 +100,7 @@ app.post('/api/inscription', async (req, res) => {
                     </div>
                 `
             });
-            console.log('E-mail de confirmation envoyé via Resend :', data.id);
+            console.log('E-mail de confirmation envoyé via Resend avec succès. ID:', data.id);
         } catch (mailErr) {
             console.error("Erreur lors de l'envoi d'e-mail via Resend :", mailErr);
         }
