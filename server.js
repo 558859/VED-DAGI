@@ -78,7 +78,7 @@ app.post('/api/inscription', async (req, res) => {
         await db.execute(query, [nom, email, pays, telephone, niveau, message]);
         console.log('Inscription enregistrée avec succès dans la base de données.');
 
-        // 2. Envoi de l'e-mail via l'API HTTP Brevo (sans blocage de port SMTP)
+        // 2. Envoi de l'e-mail via l'API HTTP Brevo
         try {
             const sendSmtpEmail = new Brevo.SendSmtpEmail();
             sendSmtpEmail.subject = "Confirmation de votre inscription - V.E.D DAGI";
@@ -99,12 +99,12 @@ app.post('/api/inscription', async (req, res) => {
                     <p>Cordialement,<br><strong>L'équipe V.E.D DAGI</strong></p>
                 </div>
             `;
-            // L'adresse de l'expéditeur doit correspondre à votre compte Brevo
-            sendSmtpEmail.sender = { "name": "V.E.D DAGI", "email": "votre_email_brevo@gmail.com" };
+            // Adresse expéditeur validée sur Brevo
+            sendSmtpEmail.sender = { "name": "V.E.D DAGI", "email": "abouibrahim401@gmail.com" };
             sendSmtpEmail.to = [{ "email": email, "name": nom }];
 
             const response = await apiInstance.sendTransacEmail(sendSmtpEmail);
-            console.log('E-mail de confirmation envoyé via Brevo avec succès. ID:', response.messageId);
+            console.log('E-mail de confirmation envoyé via Brevo avec succès. ID:', response.body?.messageId || response.messageId);
         } catch (mailErr) {
             console.error("Erreur lors de l'envoi d'e-mail via Brevo :", mailErr);
         }
